@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EarnHub | Dashboard</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      background: #0b1120;
+      color: #ffffff;
+      font-family: Arial, sans-serif;
+    }
+
+    header {
+      padding: 20px;
+      background: #151f32;
+      border-bottom: 1px solid #26364e;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    header h2 {
+      color: #38d996;
+      margin: 0;
+    }
+
+    button {
+      background: #38d996;
+      color: #07140f;
+      border: none;
+      border-radius: 8px;
+      padding: 11px 16px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    main {
+      max-width: 950px;
+      margin: auto;
+      padding: 24px 16px;
+    }
+
+    .welcome {
+      margin-bottom: 25px;
+    }
+
+    .welcome p,
+    .card p {
+      color: #b8c4d6;
+      line-height: 1.6;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px;
+    }
+
+    .card {
+      background: #151f32;
+      border: 1px solid #26364e;
+      border-radius: 14px;
+      padding: 22px;
+    }
+
+    .card h3 {
+      margin-top: 0;
+    }
+
+    .amount {
+      font-size: 28px;
+      font-weight: bold;
+      color: #38d996;
+      margin: 18px 0;
+    }
+
+    .notice {
+      margin-top: 22px;
+      padding: 16px;
+      border-radius: 10px;
+      background: #222c40;
+      color: #d7e0ee;
+      line-height: 1.6;
+    }
+
+    .email {
+      overflow-wrap: anywhere;
+    }
+
+    #message {
+      color: #38d996;
+    }
+
+    a {
+      color: #38d996;
+    }
+
+    footer {
+      text-align: center;
+      padding: 25px;
+      color: #b8c4d6;
+    }
+  </style>
+</head>
+
+<body>
+
+  <header>
+    <h2>EarnHub</h2>
+    <button id="logoutBtn" hidden>Log Out</button>
+  </header>
+
+  <main>
+
+    <section class="welcome">
+      <h1>My Dashboard 👋</h1>
+      <p>Welcome to your EarnHub account.</p>
+
+      <p>Account: <strong id="userEmail" class="email">Checking...</strong></p>
+      <p id="accountStatus">Checking your login status...</p>
+      <p id="message"></p>
+    </section>
+
+    <section class="grid">
+
+      <div class="card">
+        <h3>💰 Available Balance</h3>
+        <div class="amount">$0.00</div>
+        <p>Your confirmed, withdrawable rewards will appear here once the earning system is implemented.</p>
+      </div>
+
+      <div class="card">
+        <h3>⏳ Pending Rewards</h3>
+        <div class="amount">$0.00</div>
+        <p>Rewards awaiting verification will appear here once offer providers are connected.</p>
+      </div>
+
+      <div class="card">
+        <h3>🎯 Earn Rewards</h3>
+        <p>Complete eligible offers and tasks after our earning partners are integrated.</p>
+        <button id="earnBtn">Explore Opportunities</button>
+      </div>
+
+      <div class="card">
+        <h3>💸 Withdrawals</h3>
+        <p>Withdrawal methods are not configured yet. We'll add supported payment options later.</p>
+        <button id="withdrawBtn">Withdrawal Status</button>
+      </div>
+
+    </section>
+
+    <div class="notice">
+      <strong>Important:</strong> This dashboard is under development.
+      The displayed balances are placeholders, not actual earnings.
+      No real offers or withdrawals are available yet.
+    </div>
+
+    <p><a href="index.html">← Back to EarnHub Home</a></p>
+
+  </main>
+
+  <footer>
+    EarnHub &copy; 2026 | Earn. Complete. Get Rewarded.
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <script>
+    // Use the SAME Supabase details as in auth.html.
+    const SUPABASE_URL = "https://ncgijesgfoadjyshfoqv.supabase.co";
+    const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_qRghUkUbwl_M6qAD3dGnTA_Oe1qaoHM";
+
+    const client = window.supabase.createClient(
+      SUPABASE_URL,
+      SUPABASE_PUBLISHABLE_KEY
+    );
+
+    async function loadDashboard() {
+      const status = document.getElementById("accountStatus");
+      const email = document.getElementById("userEmail");
+
+      try {
+        const { data, error } = await client.auth.getSession();
+
+        if (error) throw error;
+
+        const session = data.session;
+
+        if (!session) {
+          window.location.replace("auth.html");
+          return;
+        }
+
+        email.textContent = session.user.email || "Email unavailable";
+        status.textContent = "Account connected";
+        document.getElementById("logoutBtn").hidden = false;
+
+      } catch (error) {
+        status.textContent = "Unable to verify your account.";
+        document.getElementById("message").textContent =
+          "Please check your connection and try again.";
+      }
+    }
+
+    document.getElementById("logoutBtn").addEventListener(
+      "click",
+      async function () {
+        const { error } = await client.auth.signOut();
+
+        if (error) {
+          document.getElementById("message").textContent =
+            "Logout failed. Please try again.";
+          return;
+        }
+
+        window.location.replace("auth.html");
+      }
+    );
+
+    document.getElementById("earnBtn").addEventListener(
+      "click",
+      function () {
+        alert("Earning opportunities are not available yet. We're working on it!");
+      }
+    );
+
+    document.getElementById("withdrawBtn").addEventListener(
+      "click",
+      function () {
+        alert("Withdrawal services are not configured yet.");
+      }
+    );
+
+    loadDashboard();
+  </script>
+
+</body>
+</html>
