@@ -213,9 +213,11 @@ console.error("Could not load username:", profileError.message);
 }
 
 document.getElementById("usernameGreeting").textContent =
-profile?.username? 
-`Welcome, ${profile.username}! 👋`
-: "Welcome to EarnHub! 👋";
+  profileError
+    ? "Profile error: " + profileError.message
+    : profile?.username
+      ? `Welcome, ${profile.username}! 👋`
+      : "Profile loaded, but username is empty.";
         status.textContent = "Account connected";
         document.getElementById("logoutBtn").hidden = false;
 
