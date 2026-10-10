@@ -203,15 +203,19 @@
 
         email.textContent = session.user.email || "Email unavailable";
         const { data: profile, error: profileError } = await client
-  .from("profiles")
-  .select("username")
-  .eq("id", session.user.id)
-  .single();
+.from("profiles")
+.select("username")
+.eq("id", session.user.id)
+.maybeSingle();
+
+if (profileError) {
+console.error("Could not load username:", profileError.message);
+}
 
 document.getElementById("usernameGreeting").textContent =
-  profile?.username
-    ? `Welcome, ${profile.username}! 👋`
-    : "Welcome to EarnHub! 👋";
+profile?.username
+? "Welcome, ${profile.username}! 👋"
+: "Welcome to EarnHub! 👋";
         status.textContent = "Account connected";
         document.getElementById("logoutBtn").hidden = false;
 
