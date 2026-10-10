@@ -93,6 +93,7 @@
 
     const form = document.getElementById("authForm");
     const emailInput = document.getElementById("email");
+    const usernameInput = document.getElementById("username");
     const passwordInput = document.getElementById("password");
     const message = document.getElementById("message");
     const signupButton = document.getElementById("signup");
@@ -134,10 +135,13 @@
 
       const { data, error } = await client.auth.signUp({
         email: emailInput.value.trim(),
-        password: passwordInput.value,
-        options: {
-          emailRedirectTo: window.location.origin + window.location.pathname
-        }
+password: passwordInput.value,
+options: {
+  data: {
+    username: usernameInput.value.trim()
+  },
+  emailRedirectTo: window.location.origin + window.location.pathname
+}
       });
 
       if (error) {
