@@ -1,0 +1,172 @@
+<!DOCTYPE html><html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EarnHub | Account</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      padding: 20px;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: Arial, sans-serif;
+      background: #0b1120;
+      color: #fff;
+    }
+    .card {
+      width: 100%;
+      max-width: 420px;
+      padding: 28px;
+      border-radius: 16px;
+      background: #151f32;
+      border: 1px solid #26364e;
+    }
+    h1 { color: #38d996; margin-bottom: 6px; }
+    p { color: #b8c4d6; line-height: 1.5; }
+    label { display: block; margin: 16px 0 7px; }
+    input {
+      width: 100%;
+      padding: 13px;
+      border-radius: 8px;
+      border: 1px solid #34445d;
+      background: #0b1120;
+      color: white;
+      font-size: 16px;
+    }
+    button {
+      width: 100%;
+      padding: 13px;
+      margin-top: 14px;
+      border: 0;
+      border-radius: 8px;
+      background: #38d996;
+      color: #07140f;
+      font-weight: bold;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    button.secondary {
+      background: #26364e;
+      color: white;
+    }
+    #message {
+      overflow-wrap: anywhere;
+      margin-top: 16px;
+    }
+    a { color: #38d996; }
+    .small { font-size: 13px; }
+  </style>
+</head>
+<body>
+  <main class="card">
+    <h1>EarnHub</h1>
+    <p>Create your account or sign in to continue.</p><form id="authForm">
+  <label for="email">Email address</label>
+  <input id="email" type="email" required autocomplete="email"
+    placeholder="you@example.com">
+
+  <label for="password">Password</label>
+  <input id="password" type="password" required minlength="6"
+    autocomplete="current-password" placeholder="At least 6 characters">
+
+  <button type="submit" id="signup">Create Account</button>
+  <button type="button" class="secondary" id="login">Log In</button>
+  <button type="button" class="secondary" id="logout" hidden>Log Out</button>
+</form>
+
+<p id="message" role="status"></p>
+<p class="small"><a href="index.html">Back to EarnHub home</a></p>
+
+  </main>  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>  <script>
+    // Replace these two values with your own Supabase details.
+    const SUPABASE_URL = "https://ncgijesgfoadjyshfoqv.supabase.co";
+    const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_qRghUkUbwl_M6qAD3dGnTA_Oe1qaoHM";
+
+    const client = window.supabase.createClient(
+      SUPABASE_URL,
+      SUPABASE_PUBLISHABLE_KEY
+    );
+
+    const form = document.getElementById("authForm");
+    const emailInput = document.getElementById("email");
+    const passwordInput = document.getElementById("password");
+    const message = document.getElementById("message");
+    const signupButton = document.getElementById("signup");
+    const loginButton = document.getElementById("login");
+    const logoutButton = document.getElementById("logout");
+
+    function showMessage(text) {
+      message.textContent = text;
+    }
+
+    signupButton.addEventListener("click", () => {
+      passwordInput.autocomplete = "new-password";
+    });
+
+    loginButton.addEventListener("click", async () => {
+      passwordInput.autocomplete = "current-password";
+      showMessage("Signing in...");
+
+      const { data, error } = await client.auth.signInWithPassword({
+        email: emailInput.value.trim(),
+        password: passwordInput.value
+      });
+
+      if (error) {
+        showMessage(error.message);
+        return;
+      }
+
+      showMessage("You're logged in! Your account is connected.");
+      form.querySelectorAll("input").forEach(input => input.disabled = true);
+      signupButton.hidden = true;
+      loginButton.hidden = true;
+      logoutButton.hidden = false;
+    });
+
+    form.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      showMessage("Creating your account...");
+
+      const { data, error } = await client.auth.signUp({
+        email: emailInput.value.trim(),
+        password: passwordInput.value,
+        options: {
+          emailRedirectTo: window.location.origin + window.location.pathname
+        }
+      });
+
+      if (error) {
+        showMessage(error.message);
+        return;
+      }
+
+      if (data.session) {
+        showMessage("Account created and signed in successfully!");
+      } else {
+        showMessage("Account created! Check your email and click the confirmation link before logging in.");
+      }
+    });
+
+    logoutButton.addEventListener("click", async () => {
+      const { error } = await client.auth.signOut();
+
+      if (error) {
+        showMessage(error.message);
+        return;
+      }
+
+      form.querySelectorAll("input").forEach(input => {
+        input.disabled = false;
+        input.value = "";
+      });
+      signupButton.hidden = false;
+      loginButton.hidden = false;
+      logoutButton.hidden = true;
+      showMessage("You've logged out.");
+    });
+  </script></body>
+    </html>
