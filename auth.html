@@ -120,7 +120,7 @@
         return;
       }
 
-      showMessage("You're logged in! Your account is connected.");
+      window.location.href = "dashboard.html";
       form.querySelectorAll("input").forEach(input => input.disabled = true);
       signupButton.hidden = true;
       loginButton.hidden = true;
