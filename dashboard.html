@@ -123,6 +123,7 @@
 
     <section class="welcome">
       <h1>My Dashboard 👋</h1>
+      <p id="usernameGreeting">Welcome!</p>
       <p>Welcome to your EarnHub account.</p>
 
       <p>Account: <strong id="userEmail" class="email">Checking...</strong></p>
@@ -201,6 +202,16 @@
         }
 
         email.textContent = session.user.email || "Email unavailable";
+        const { data: profile, error: profileError } = await client
+  .from("profiles")
+  .select("username")
+  .eq("id", session.user.id)
+  .single();
+
+document.getElementById("usernameGreeting").textContent =
+  profile?.username
+    ? `Welcome, ${profile.username}! 👋`
+    : "Welcome to EarnHub! 👋";
         status.textContent = "Account connected";
         document.getElementById("logoutBtn").hidden = false;
 
