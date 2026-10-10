@@ -1,0 +1,326 @@
+<!DOCTYPE html><html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EarnHub Admin</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    * { box-sizing: border-box; }body {
+  margin: 0;
+  padding: 20px;
+  font-family: Arial, sans-serif;
+  background: #f3f6fb;
+  color: #172033;
+}
+
+.container {
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+h1 { margin: 0; font-size: 27px; }
+h2 { font-size: 19px; }
+
+.muted { color: #657085; overflow-wrap: anywhere; }
+
+.card {
+  background: white;
+  padding: 20px;
+  border-radius: 14px;
+  margin-bottom: 18px;
+  box-shadow: 0 3px 14px rgba(20, 35, 60, 0.06);
+}
+
+button, .button {
+  display: inline-block;
+  border: 0;
+  border-radius: 8px;
+  padding: 11px 15px;
+  font-size: 14px;
+  font-weight: bold;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.primary { background: #1769e0; color: white; }
+.approve { background: #dcfce7; color: #166534; }
+.reject { background: #fee2e2; color: #991b1b; }
+.secondary { background: #e8edf5; color: #172033; }
+
+button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.reward {
+  border-top: 1px solid #e6eaf0;
+  padding: 16px 0;
+}
+
+.reward:first-of-type { border-top: 0; }
+
+.reward p {
+  margin: 8px 0;
+  overflow-wrap: anywhere;
+}
+
+.status {
+  display: inline-block;
+  padding: 5px 9px;
+  border-radius: 20px;
+  background: #eef2f7;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 9px;
+  margin-top: 12px;
+}
+
+#message {
+  padding: 12px;
+  border-radius: 8px;
+  background: #e8edf5;
+  margin-bottom: 16px;
+  overflow-wrap: anywhere;
+}
+
+.hidden { display: none; }
+
+@media (max-width: 480px) {
+  body { padding: 14px; }
+  h1 { font-size: 23px; }
+  .card { padding: 16px; }
+}
+
+  </style>
+</head>
+<body>
+  <main class="container">
+    <header>
+      <div>
+        <h1>EarnHub Admin 🛡️</h1>
+        <p class="muted">Reward management</p>
+      </div>
+      <button id="logoutButton" class="secondary hidden" type="button">
+        Log out
+      </button>
+    </header><div id="message" role="status" aria-live="polite">
+  Checking your account...
+</div>
+
+<section id="adminPanel" class="hidden">
+  <div class="card">
+    <h2>Administrator</h2>
+    <p id="adminEmail" class="muted"></p>
+    <p>Review pending rewards before approving or rejecting them.</p>
+    <button id="refreshButton" class="primary" type="button">
+      Refresh rewards
+    </button>
+  </div>
+
+  <div class="card">
+    <h2>Reward submissions</h2>
+    <div id="rewardList">Loading rewards...</div>
+  </div>
+</section>
+
+  </main>  <script>
+    const SUPABASE_URL = "https://ncgijesgfoadjyshfoqv.supabase.co";
+    const SUPABASE_KEY = "sb_publishable_qRghUkUbwl_M6qAD3dGnTA_Oe1qaoHM";
+
+    const client = window.supabase.createClient(
+      SUPABASE_URL,
+      SUPABASE_KEY
+    );
+
+    const message = document.getElementById("message");
+    const adminPanel = document.getElementById("adminPanel");
+    const rewardList = document.getElementById("rewardList");
+    const logoutButton = document.getElementById("logoutButton");
+    const refreshButton = document.getElementById("refreshButton");
+
+    function showMessage(text) {
+      message.textContent = text;
+    }
+
+    function addTextElement(parent, tag, text, className) {
+      const element = document.createElement(tag);
+      element.textContent = text;
+      if (className) element.className = className;
+      parent.appendChild(element);
+      return element;
+    }
+
+    async function loadRewards() {
+      rewardList.replaceChildren();
+      addTextElement(rewardList, "p", "Loading rewards...", "muted");
+      refreshButton.disabled = true;
+
+      const { data, error } = await client
+        .from("rewards")
+        .select("id, user_id, amount, status, source, reference, created_at")
+        .order("created_at", { ascending: false })
+        .limit(100);
+
+      refreshButton.disabled = false;
+      rewardList.replaceChildren();
+
+      if (error) {
+        addTextElement(
+          rewardList,
+          "p",
+          "Could not load rewards: " + error.message
+        );
+        return;
+      }
+
+      if (!data || data.length === 0) {
+        addTextElement(
+          rewardList,
+          "p",
+          "No reward submissions yet.",
+          "muted"
+        );
+        return;
+      }
+
+      data.forEach((reward) => {
+        const item = document.createElement("article");
+        item.className = "reward";
+
+        addTextElement(item, "p", "Amount: $" + Number(reward.amount).toFixed(2));
+        addTextElement(item, "p", "Status: " + reward.status, "status");
+        addTextElement(item, "p", "Source: " + (reward.source || "Unknown"));
+        addTextElement(item, "p", "User ID: " + reward.user_id, "muted");
+        addTextElement(item, "p", "Reward ID: " + reward.id, "muted");
+
+        if (reward.reference) {
+          addTextElement(item, "p", "Reference: " + reward.reference);
+        }
+
+        addTextElement(
+          item,
+          "p",
+          "Submitted: " + new Date(reward.created_at).toLocaleString(),
+          "muted"
+        );
+
+        if (reward.status === "pending") {
+          const actions = document.createElement("div");
+          actions.className = "actions";
+
+          const approveButton = document.createElement("button");
+          approveButton.type = "button";
+          approveButton.className = "approve";
+          approveButton.textContent = "Approve";
+
+          const rejectButton = document.createElement("button");
+          rejectButton.type = "button";
+          rejectButton.className = "reject";
+          rejectButton.textContent = "Reject";
+
+          approveButton.addEventListener("click", () => {
+            reviewReward(reward.id, "approved", approveButton, rejectButton);
+          });
+
+          rejectButton.addEventListener("click", () => {
+            reviewReward(reward.id, "rejected", approveButton, rejectButton);
+          });
+
+          actions.append(approveButton, rejectButton);
+          item.appendChild(actions);
+        }
+
+        rewardList.appendChild(item);
+      });
+    }
+
+    async function reviewReward(rewardId, decision, approveButton, rejectButton) {
+      const action = decision === "approved" ? "approve" : "reject";
+
+      if (!confirm("Are you sure you want to " + action + " this reward?")) {
+        return;
+      }
+
+      approveButton.disabled = true;
+      rejectButton.disabled = true;
+      showMessage("Processing reward review...");
+
+      const { error } = await client.rpc("review_earnhub_reward", {
+        p_reward_id: rewardId,
+        p_decision: decision
+      });
+
+      if (error) {
+        showMessage("Review failed: " + error.message);
+        approveButton.disabled = false;
+        rejectButton.disabled = false;
+        return;
+      }
+
+      showMessage("Reward " + decision + " successfully.");
+      await loadRewards();
+    }
+
+    async function initializeAdmin() {
+      const { data, error } = await client.auth.getSession();
+
+      if (error || !data.session) {
+        window.location.replace("auth.html");
+        return;
+      }
+
+      logoutButton.classList.remove("hidden");
+      document.getElementById("adminEmail").textContent =
+        data.session.user.email || "Signed-in user";
+
+      const { data: isAdmin, error: adminError } = await client.rpc(
+        "is_earnhub_admin"
+      );
+
+      if (adminError) {
+        showMessage("Could not verify administrator access: " + adminError.message);
+        return;
+      }
+
+      if (isAdmin !== true) {
+        showMessage("Access denied. This account is not an EarnHub administrator.");
+        return;
+      }
+
+      adminPanel.classList.remove("hidden");
+      showMessage("Administrator access verified.");
+      await loadRewards();
+    }
+
+    refreshButton.addEventListener("click", loadRewards);
+
+    logoutButton.addEventListener("click", async () => {
+      logoutButton.disabled = true;
+      const { error } = await client.auth.signOut();
+
+      if (error) {
+        showMessage("Logout failed: " + error.message);
+        logoutButton.disabled = false;
+        return;
+      }
+
+      window.location.replace("auth.html");
+    });
+
+    initializeAdmin();
+  </script></body>
+  </html>
