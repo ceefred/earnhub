@@ -39,4 +39,29 @@
 <script>
 const tabs=[...document.querySelectorAll('.tab')],sections=[...document.querySelectorAll('.section')];tabs.forEach(t=>t.addEventListener('click',()=>{tabs.forEach(x=>x.classList.toggle('active',x===t));sections.forEach(s=>s.classList.toggle('active',s.id===t.dataset.tab))}));
 const modal=document.getElementById('modal');function closeModal(){modal.classList.remove('show')}document.querySelectorAll('[data-demo]').forEach(b=>b.addEventListener('click',()=>{document.getElementById('modalText').textContent=b.dataset.demo;modal.classList.add('show')}));document.querySelector('.close').addEventListener('click',closeModal);document.getElementById('modalOk').addEventListener('click',closeModal);modal.addEventListener('click',e=>{if(e.target===modal)closeModal()});
+</script><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script>
+(async function () {
+  const SUPABASE_URL = "https://ncgijesgfoadjyshfoqv.supabase.co";
+  const SUPABASE_KEY = "sb_publishable_qRghUkUbwl_M6qAD3dGnTA_Oe1qaoHM";
+
+  const client = window.supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_KEY
+  );
+
+  const { data: { session } } = await client.auth.getSession();
+
+  if (session) {
+    const authLinks = document.querySelectorAll('a[href="auth.html"]');
+
+    authLinks.forEach((link, index) => {
+      if (index === 0) {
+        link.textContent = "Open Dashboard";
+        link.href = "dashboard.html";
+      } else {
+        link.style.display = "none";
+      }
+    });
+  }
+})();
 </script></body></html>
