@@ -65,7 +65,8 @@
     <h1>EarnHub</h1>
     <p>Create your account or sign in to continue.</p><form id="authForm">
   <label for="email">Email address</label>
-  <input id="email" type="email" required autocomplete="email"
+  <label for="username">Username</label>
+<input id="username" type="text" autocomplete="username" placeholder="Choose a username" minlength="3" maxlength="20" pattern="[A-Za-z0-9_]+" title="Use 3–20 letters, numbers, or underscores"><input id="email" type="email" required autocomplete="email"
     placeholder="you@example.com">
 
   <label for="password">Password</label>
