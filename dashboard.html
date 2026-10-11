@@ -379,6 +379,58 @@ withdrawalForm.addEventListener("submit", async (event) => {
     withdrawalSubmit.disabled = false;
   }
 });
+        // Load the user's withdrawal history
+async function loadWithdrawalHistory() {
+  const list = document.getElementById("withdrawalHistoryList");
+  if (!list) return;
+
+  list.textContent = "Loading withdrawal history...";
+
+  const { data, error } = await client
+    .from("withdrawal_requests")
+    .select("amount, payment_method, status, created_at")
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    list.textContent = "Could not load withdrawal history. Please refresh.";
+    console.error("Withdrawal history error:", error.message);
+    return;
+  }
+
+  list.replaceChildren();
+
+  if (!data || data.length === 0) {
+    list.textContent = "You have no withdrawal requests yet.";
+    return;
+  }
+
+  data.forEach((request) => {
+    const item = document.createElement("div");
+    item.style.cssText = "padding:14px 0;border-bottom:1px solid #ddd;";
+
+    const amount = document.createElement("p");
+    amount.textContent = "Amount: $" + Number(request.amount).toFixed(2);
+
+    const method = document.createElement("p");
+    method.textContent = "Payment method: " +
+      (request.payment_method === "bank_transfer"
+        ? "Bank Transfer"
+        : "Cryptocurrency");
+
+    const status = document.createElement("p");
+    status.textContent = "Status: " +
+      request.status.charAt(0).toUpperCase() + request.status.slice(1);
+
+    const date = document.createElement("p");
+    date.textContent = "Date: " +
+      new Date(request.created_at).toLocaleString();
+
+    item.append(amount, method, status, date);
+    list.appendChild(item);
+  });
+}
+
+loadWithdrawalHistory();
         const { data: profile, error: profileError } = await client
 .from("profiles")
 .select("username")
