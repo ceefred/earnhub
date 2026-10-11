@@ -320,7 +320,70 @@ button:disabled {
 
       window.location.replace("auth.html");
     });
+// EarnHub Admin User Management
+const userSection = document.createElement("section");
+userSection.className = "card";
+userSection.innerHTML = `
+  <h2>👥 Registered Users</h2>
+  <p>View registered accounts and wallet balances.</p>
+  <button type="button" id="refreshUsers">Refresh Users</button>
+  <div id="registeredUsers">Loading registered users...</div>
+`;
+document.body.appendChild(userSection);
 
+async function loadRegisteredUsers() {
+  const container = document.getElementById("registeredUsers");
+  container.textContent = "Loading registered users...";
+
+  const { data, error } = await client.rpc("get_earnhub_admin_users");
+
+  if (error) {
+    container.textContent = "Could not load users: " + error.message;
+    return;
+  }
+
+  container.replaceChildren();
+
+  if (!data || data.length === 0) {
+    container.textContent = "No registered users found.";
+    return;
+  }
+
+  data.forEach((user) => {
+    const item = document.createElement("div");
+    item.style.cssText = "padding:16px 0;border-bottom:1px solid #ddd;";
+
+    const username = document.createElement("h3");
+    username.textContent = user.username
+      ? "@" + user.username
+      : "No username";
+
+    const email = document.createElement("p");
+    email.textContent = "Email: " + (user.email || "Not available");
+
+    const available = document.createElement("p");
+    available.textContent =
+      "Available balance: $" + Number(user.available_balance).toFixed(2);
+
+    const pending = document.createElement("p");
+    pending.textContent =
+      "Pending balance: $" + Number(user.pending_balance).toFixed(2);
+
+    const joined = document.createElement("p");
+    joined.textContent =
+      "Joined: " + new Date(user.joined_at).toLocaleDateString();
+
+    item.append(username, email, available, pending, joined);
+    container.appendChild(item);
+  });
+}
+
+document.getElementById("refreshUsers").addEventListener(
+  "click",
+  loadRegisteredUsers
+);
+
+loadRegisteredUsers();
     initializeAdmin();
     // EarnHub Withdrawal Management
 const withdrawalSection = document.createElement("section");
