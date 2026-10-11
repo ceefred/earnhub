@@ -322,5 +322,116 @@ button:disabled {
     });
 
     initializeAdmin();
+    // EarnHub Withdrawal Management
+const withdrawalSection = document.createElement("section");
+withdrawalSection.className = "card";
+withdrawalSection.innerHTML = `
+  <h2>💸 Withdrawal Requests</h2>
+  <p>Review and manage user withdrawals.</p>
+  <button id="refreshWithdrawals">Refresh Withdrawals</button>
+  <div id="withdrawalRequests">Loading withdrawals...</div>
+`;
+
+document.body.appendChild(withdrawalSection);
+
+async function loadWithdrawals() {
+  const container = document.getElementById("withdrawalRequests");
+  container.textContent = "Loading withdrawals...";
+
+  const { data, error } = await client
+    .from("withdrawal_requests")
+    .select("*")
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    container.textContent = "Could not load withdrawals: " + error.message;
+    return;
+  }
+
+  container.replaceChildren();
+
+  if (!data || data.length === 0) {
+    container.textContent = "No withdrawal requests yet.";
+    return;
+  }
+
+  data.forEach((request) => {
+    const item = document.createElement("div");
+    item.style.cssText = "padding:16px 0;border-bottom:1px solid #ddd;";
+
+    const details = document.createElement("p");
+    details.textContent =
+      "Amount: $" + Number(request.amount).toFixed(2) +
+      " | Status: " + request.status +
+      " | Method: " + request.payment_method +
+      " | User: " + request.user_id;
+
+    const payment = document.createElement("p");
+    payment.textContent = "Payment details: " + request.payment_details;
+
+    const id = document.createElement("small");
+    id.textContent = "Request ID: " + request.id;
+
+    item.append(details, payment, id);
+
+    if (request.status === "pending") {
+      item.appendChild(
+        makeWithdrawalButton(request.id, "approved", "Approve")
+      );
+      item.appendChild(
+        makeWithdrawalButton(request.id, "rejected", "Reject")
+      );
+    } else if (request.status === "approved") {
+      item.appendChild(
+        makeWithdrawalButton(request.id, "paid", "Mark as Paid")
+      );
+    }
+
+    container.appendChild(item);
+  });
+}
+
+function makeWithdrawalButton(requestId, decision, label) {
+  const button = document.createElement("button");
+  button.textContent = label;
+  button.style.marginRight = "8px";
+
+  button.addEventListener("click", async () => {
+    if (
+      decision === "paid" &&
+      !confirm("Have you actually sent this payment?")
+    ) {
+      return;
+    }
+
+    if (!confirm("Are you sure you want to " + decision + " this withdrawal?")) {
+      return;
+    }
+
+    button.disabled = true;
+
+    const { error } = await client.rpc("review_earnhub_withdrawal", {
+      p_request_id: requestId,
+      p_decision: decision
+    });
+
+    if (error) {
+      alert("Withdrawal update failed: " + error.message);
+      button.disabled = false;
+      return;
+    }
+
+    alert("Withdrawal updated successfully.");
+    loadWithdrawals();
+  });
+
+  return button;
+}
+
+document
+  .getElementById("refreshWithdrawals")
+  .addEventListener("click", loadWithdrawals);
+
+loadWithdrawals();
   </script></body>
   </html>
