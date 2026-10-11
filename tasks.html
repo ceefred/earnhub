@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#101827">
+<title>Simple Tasks | EarnHub</title>
+
+<style>
+:root {
+  --bg: #0b1220;
+  --panel: #121d30;
+  --text: #edf4ff;
+  --muted: #9fb0c8;
+  --accent: #71e0b5;
+  --border: #263650;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: linear-gradient(160deg,#0b1220,#101b2d 55%,#0c1423);
+  color: var(--text);
+  font: 16px/1.6 system-ui,sans-serif;
+}
+
+.wrap {
+  width: min(850px,92%);
+  margin: auto;
+  padding: 24px 0;
+}
+
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 28px;
+}
+
+.brand {
+  color: var(--text);
+  font-size: 25px;
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.brand span, h1, h2 { color: var(--accent); }
+
+a { color: var(--accent); }
+
+nav a { margin-right: 12px; }
+
+.card {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 15px;
+  padding: 20px;
+  margin: 18px 0;
+}
+
+.muted { color: var(--muted); }
+
+.notice {
+  border: 1px solid #75612d;
+  background: #292719;
+  padding: 15px;
+  border-radius: 12px;
+}
+
+label {
+  display: block;
+  margin-top: 15px;
+  font-weight: 600;
+}
+
+textarea {
+  width: 100%;
+  min-height: 100px;
+  margin-top: 7px;
+  padding: 12px;
+  border-radius: 9px;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--text);
+  font: inherit;
+}
+
+button {
+  min-height: 44px;
+  margin-top: 12px;
+  padding: 10px 16px;
+  border: 0;
+  border-radius: 9px;
+  background: var(--accent);
+  color: #0b1220;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+button:disabled {
+  opacity: .6;
+  cursor: not-allowed;
+}
+
+.status {
+  margin-top: 10px;
+  overflow-wrap: anywhere;
+}
+
+footer {
+  margin-top: 35px;
+  padding: 20px 0;
+  border-top: 1px solid var(--border);
+  color: var(--muted);
+  font-size: 14px;
+}
+</style>
+</head>
+
+<body>
+<div class="wrap">
+
+<header>
+  <a class="brand" href="index.html">Earn<span>Hub</span></a>
+  <nav aria-label="Main navigation">
+    <a href="dashboard.html">Dashboard</a>
+    <a href="index.html">Home</a>
+  </nav>
+</header>
+
+<main>
+  <h1>Simple Tasks</h1>
+  <p class="muted">
+    Complete available tasks and submit your proof for review.
+  </p>
+
+  <div class="notice">
+    <strong>Testing notice:</strong>
+    EarnHub's simple-task system is being developed.
+    Rewards shown here are not guaranteed income, and test
+    balances do not represent real money. A submission must
+    be reviewed before any reward can be approved.
+  </div>
+
+  <section class="card">
+    <h2>Your submissions</h2>
+    <div id="mySubmissions" aria-live="polite">
+      Loading your submissions...
+    </div>
+  </section>
+
+  <h2>Available tasks</h2>
+  <div id="taskList" aria-live="polite">
+    Loading available tasks...
+  </div>
+
+  <p id="pageMessage" class="status" aria-live="polite"></p>
+</main>
+
+<footer>
+  EarnHub is a prototype, not a live earning service.
+  <p>
+    <a href="privacy.html">Privacy Policy</a> ·
+    <a href="terms.html">Terms of Use</a> ·
+    <a href="contact.html">Contact Us</a>
+  </p>
+</footer>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script>
+const SUPABASE_URL = "https://ncgijesgfoadjyshfoqv.supabase.co";
+const SUPABASE_KEY =
+  "sb_publishable_qRghUkUbwl_M6qAD3dGnTA_Oe1qaoHM";
+
+const client = window.supabase.createClient(
+  SUPABASE_URL,
+  SUPABASE_KEY
+);
+
+const taskList = document.getElementById("taskList");
+const mySubmissions = document.getElementById("mySubmissions");
+const pageMessage = document.getElementById("pageMessage");
+
+let currentUser = null;
+let submittedTaskIds = new Set();
+
+function makeElement(tag, text, className) {
+  const element = document.createElement(tag);
+  element.textContent = text;
+
+  if (className) element.className = className;
+
+  return element;
+}
+
+async function loadPage() {
+  const { data, error } = await client.auth.getSession();
+
+  if (error || !data.session) {
+    window.location.href = "auth.html";
+    return;
+  }
+
+  currentUser = data.session.user;
+
+  await Promise.all([
+    loadSubmissions(),
+    loadTasks()
+  ]);
+}
+
+async function loadSubmissions() {
+  mySubmissions.textContent = "Loading your submissions...";
+
+  const { data, error } = await client
+    .from("task_submissions")
+    .select("task_id, status, created_at, admin_notes, tasks(title)")
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    mySubmissions.textContent =
+      "Could not load submissions: " + error.message;
+    return;
+  }
+
+  mySubmissions.replaceChildren();
+  submittedTaskIds = new Set(
+    data.map(item => item.task_id)
+  );
+
+  if (data.length === 0) {
+    mySubmissions.textContent =
+      "You have not submitted any tasks yet.";
+    return;
+  }
+
+  data.forEach(item => {
+    const card = document.createElement("div");
+    card.style.cssText =
+      "padding:12px 0;border-bottom:1px solid #263650;";
+
+    card.appendChild(
+      makeElement("strong", item.tasks?.title || "Task")
+    );
+
+    card.appendChild(
+      makeElement("p", "Status: " + item.status)
+    );
+
+    card.appendChild(
+      makeElement(
+        "p",
+        "Submitted: " +
+        new Date(item.created_at).toLocaleDateString()
+      )
+    );
+
+    if (item.admin_notes) {
+      card.appendChild(
+        makeElement("p", "Review note: " + item.admin_notes)
+      );
+    }
+
+    mySubmissions.appendChild(card);
+  });
+}
+
+async function loadTasks() {
+  taskList.textContent = "Loading available tasks...";
+
+  const { data, error } = await client
+    .from("tasks")
+    .select("id, title, description, instructions, reward_amount")
+    .eq("is_active", true)
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    taskList.textContent =
+      "Could not load tasks: " + error.message;
+    return;
+  }
+
+  taskList.replaceChildren();
+
+  if (data.length === 0) {
+    taskList.appendChild(
+      makeElement(
+        "p",
+        "No tasks are available yet. Please check again later."
+      )
+    );
+    return;
+  }
+
+  data.forEach(task => {
+    const card = document.createElement("section");
+    card.className = "card";
+
+    card.appendChild(makeElement("h2", task.title));
+
+    card.appendChild(
+      makeElement("p", task.description)
+    );
+
+    card.appendChild(
+      makeElement(
+        "p",
+        "Reward offered: $" +
+        Number(task.reward_amount).toFixed(2)
+      )
+    );
+
+    card.appendChild(
+      makeElement("p", "Instructions: " + task.instructions)
+    );
+
+    if (submittedTaskIds.has(task.id)) {
+      card.appendChild(
+        makeElement(
+          "p",
+          "You have already submitted this task. Check your submission status."
+        )
+      );
+
+      taskList.appendChild(card);
+      return;
+    }
+
+    const label = makeElement("label", "Your proof");
+    const proof = document.createElement("textarea");
+
+    proof.placeholder =
+      "Describe what you completed or provide the permitted proof link.";
+    proof.maxLength = 3000;
+    proof.required = true;
+    proof.setAttribute(
+      "aria-label",
+      "Proof for " + task.title
+    );
+
+    const button = makeElement("button", "Submit proof");
+    button.type = "button";
+
+    const message = makeElement("p", "", "status");
+
+    button.addEventListener("click", async () => {
+      const proofText = proof.value.trim();
+
+      if (proofText.length < 5) {
+        message.textContent =
+          "Please provide a little more detail about your proof.";
+        return;
+      }
+
+      button.disabled = true;
+      message.textContent = "Submitting...";
+
+      const { error: submitError } = await client
+        .from("task_submissions")
+        .insert({
+          task_id: task.id,
+          user_id: currentUser.id,
+          proof: proofText
+        });
+
+      if (submitError) {
+        message.textContent =
+          submitError.code === "23505"
+            ? "You have already submitted this task."
+            : "Submission failed: " + submitError.message;
+
+        button.disabled = false;
+        return;
+      }
+
+      message.textContent =
+        "Proof submitted. Your task is awaiting review.";
+
+      await Promise.all([
+        loadSubmissions(),
+        loadTasks()
+      ]);
+    });
+
+    card.append(label, proof, button, message);
+    taskList.appendChild(card);
+  });
+}
+
+loadPage();
+</script>
+</body>
+</html>
