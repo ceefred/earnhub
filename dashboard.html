@@ -224,6 +224,42 @@ if (walletError) {
   document.getElementById("pendingBalance").textContent =
     "$" + Number(wallet.pending_balance).toFixed(2);
     }
+        // Load the user's reward history
+const { data: rewards, error: rewardsError } = await client
+  .from("rewards")
+  .select("amount, status, source, created_at")
+  .eq("user_id", session.user.id)
+  .order("created_at", { ascending: false });
+
+const historyList = document.getElementById("rewardHistoryList");
+historyList.replaceChildren();
+
+if (rewardsError) {
+  historyList.textContent = "Could not load reward history. Please try again later.";
+  console.error("Reward history error:", rewardsError.message);
+} else if (!rewards || rewards.length === 0) {
+  historyList.textContent = "You haven't received any rewards yet.";
+} else {
+  rewards.forEach((reward) => {
+    const item = document.createElement("div");
+    item.style.cssText = "padding:14px 0;border-bottom:1px solid #e5e7eb;";
+
+    const amount = document.createElement("strong");
+    amount.textContent = "$" + Number(reward.amount).toFixed(2);
+
+    const details = document.createElement("p");
+    details.textContent =
+      "Source: " + (reward.source || "Unknown") +
+      " | Status: " + reward.status;
+
+    const date = document.createElement("small");
+    date.textContent =
+      "Submitted: " + new Date(reward.created_at).toLocaleString();
+
+    item.append(amount, details, date);
+    historyList.appendChild(item);
+  });
+    }
         const { data: profile, error: profileError } = await client
 .from("profiles")
 .select("username")
