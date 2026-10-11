@@ -34,7 +34,36 @@
 <div class="card provider"><div><h3>BitLabs</h3><small>Surveys / rewarded activities</small></div><span class="provider-status">Not connected</span></div>
 </div><div class="notice">Provider names are listed for planning only. Do not show their logos or imply endorsement/approval before authorization. We must apply and follow each provider's terms.</div></section>
 <section class="section" id="rules"><div class="section-head"><div><h2>How rewards work</h2><div class="muted">Built around transparency.</div></div></div><div class="grid"><div class="card"><h3>1. Complete</h3><p class="muted">Read the task instructions and complete the advertiser's required action.</p></div><div class="card"><h3>2. Verify</h3><p class="muted">The provider reports a conversion to our secure backend. Browser-only claims are not trusted.</p></div><div class="card"><h3>3. Credit</h3><p class="muted">Eligible rewards are marked pending until validation and reversal rules are satisfied.</p></div><div class="card"><h3>4. Withdraw</h3><p class="muted">Withdrawals open only after supported payment methods, thresholds, and sufficient funds are configured.</p></div></div><div class="notice">We will not promise fixed earnings until real campaign payouts, availability by country, fees, reversals, and payment timing are confirmed.</div></section>
-</main><footer class="footer">EarnHub is a working name. This prototype is not a live earning service, financial product, or promise of income. <br>Next build step: choose the hosting/backend, create real authentication, then apply to providers using a genuine site URL.</footer></div>
+</main>
+
+<footer class="footer">
+  <p>
+    EarnHub is a working name. This prototype is not a live
+    earning service, financial product, or promise of income.
+  </p>
+
+  <nav aria-label="Footer navigation">
+    <a href="index.html"
+       style="color:#71e0b5;margin-right:14px;">
+      Home
+    </a>
+
+    <a href="privacy.html"
+       style="color:#71e0b5;margin-right:14px;">
+      Privacy Policy
+    </a>
+
+    <a href="terms.html"
+       style="color:#71e0b5;margin-right:14px;">
+      Terms &amp; Conditions
+    </a>
+
+    <a href="contact.html"
+       style="color:#71e0b5;">
+      Contact Us
+    </a>
+  </nav>
+</footer></div>
 <div class="modal" id="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle"><div class="modalbox"><button class="close" aria-label="Close">×</button><h3 id="modalTitle">Demo only</h3><p id="modalText"></p><button class="btn" id="modalOk">Got it</button></div></div>
 <script>
 const tabs=[...document.querySelectorAll('.tab')],sections=[...document.querySelectorAll('.section')];tabs.forEach(t=>t.addEventListener('click',()=>{tabs.forEach(x=>x.classList.toggle('active',x===t));sections.forEach(s=>s.classList.toggle('active',s.id===t.dataset.tab))}));
