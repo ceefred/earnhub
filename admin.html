@@ -496,5 +496,276 @@ document
   .addEventListener("click", loadWithdrawals);
 
 loadWithdrawals();
+    // EarnHub Simple Task Management
+const taskSection = document.createElement("section");
+taskSection.className = "card";
+taskSection.innerHTML = `
+  <h2>📝 Create Simple Tasks</h2>
+  <p>Create tasks for registered users to complete.</p>
+
+  <form id="createTaskForm">
+    <p>
+      <label for="taskTitle">Task title</label><br>
+      <input id="taskTitle" required maxlength="120"
+        style="width:100%;padding:10px;margin-top:5px;">
+    </p>
+
+    <p>
+      <label for="taskDescription">Short description</label><br>
+      <textarea id="taskDescription" required maxlength="500"
+        style="width:100%;padding:10px;margin-top:5px;"></textarea>
+    </p>
+
+    <p>
+      <label for="taskInstructions">Task instructions</label><br>
+      <textarea id="taskInstructions" required maxlength="2000"
+        style="width:100%;padding:10px;margin-top:5px;"></textarea>
+    </p>
+
+    <p>
+      <label for="taskReward">Reward amount (USD)</label><br>
+      <input id="taskReward" type="number" min="0.01"
+        max="1000" step="0.01" required
+        style="width:100%;padding:10px;margin-top:5px;">
+    </p>
+
+    <button type="submit" class="primary">Create Task</button>
+  </form>
+
+  <p id="taskMessage" role="status"></p>
+
+  <hr style="margin:24px 0;">
+
+  <h2>📋 Existing Tasks</h2>
+  <button type="button" id="refreshTasks" class="secondary">
+    Refresh Tasks
+  </button>
+  <div id="adminTaskList">Loading tasks...</div>
+
+  <hr style="margin:24px 0;">
+
+  <h2>📨 Task Submissions</h2>
+  <button type="button" id="refreshSubmissions" class="secondary">
+    Refresh Submissions
+  </button>
+  <div id="adminSubmissionList">Loading submissions...</div>
+`;
+
+document.querySelector("main.container").appendChild(taskSection);
+
+const createTaskForm = document.getElementById("createTaskForm");
+const taskMessage = document.getElementById("taskMessage");
+const adminTaskList = document.getElementById("adminTaskList");
+const adminSubmissionList = document.getElementById("adminSubmissionList");
+
+createTaskForm.addEventListener("submit", async (event) => {
+  event.preventDefault();
+
+  const title = document.getElementById("taskTitle").value.trim();
+  const description = document.getElementById("taskDescription").value.trim();
+  const instructions = document.getElementById("taskInstructions").value.trim();
+  const reward = Number(document.getElementById("taskReward").value);
+
+  if (!title || !description || !instructions ||
+      !Number.isFinite(reward) || reward <= 0 || reward > 1000) {
+    taskMessage.textContent = "Please enter valid task details and a reward between $0.01 and $1,000.";
+    return;
+  }
+
+  const submitButton = createTaskForm.querySelector('button[type="submit"]');
+  submitButton.disabled = true;
+  taskMessage.textContent = "Creating task...";
+
+  const { error } = await client.from("tasks").insert({
+    title,
+    description,
+    instructions,
+    reward_amount: reward,
+    is_active: true
+  });
+
+  submitButton.disabled = false;
+
+  if (error) {
+    taskMessage.textContent = "Task creation failed: " + error.message;
+    return;
+  }
+
+  taskMessage.textContent = "Task created successfully.";
+  createTaskForm.reset();
+  await loadAdminTasks();
+});
+
+async function loadAdminTasks() {
+  adminTaskList.textContent = "Loading tasks...";
+
+  const { data, error } = await client
+    .from("tasks")
+    .select("id,title,description,reward_amount,is_active,created_at")
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    adminTaskList.textContent = "Could not load tasks: " + error.message;
+    return;
+  }
+
+  adminTaskList.replaceChildren();
+
+  if (!data || data.length === 0) {
+    adminTaskList.textContent = "No tasks created yet.";
+    return;
+  }
+
+  data.forEach((task) => {
+    const item = document.createElement("div");
+    item.style.cssText = "padding:14px 0;border-bottom:1px solid #ddd;";
+
+    const title = document.createElement("h3");
+    title.textContent = task.title;
+
+    const description = document.createElement("p");
+    description.textContent = task.description;
+
+    const reward = document.createElement("p");
+    reward.textContent = "Reward: $" + Number(task.reward_amount).toFixed(2);
+
+    const status = document.createElement("p");
+    status.textContent = "Status: " + (task.is_active ? "Active" : "Inactive");
+
+    item.append(title, description, reward, status);
+
+    const toggle = document.createElement("button");
+    toggle.type = "button";
+    toggle.className = "secondary";
+    toggle.textContent = task.is_active ? "Deactivate Task" : "Activate Task";
+
+    toggle.addEventListener("click", async () => {
+      toggle.disabled = true;
+
+      const { error: updateError } = await client
+        .from("tasks")
+        .update({ is_active: !task.is_active })
+        .eq("id", task.id);
+
+      if (updateError) {
+        alert("Task update failed: " + updateError.message);
+        toggle.disabled = false;
+        return;
+      }
+
+      await loadAdminTasks();
+    });
+
+    item.appendChild(toggle);
+    adminTaskList.appendChild(item);
+  });
+}
+
+async function loadAdminSubmissions() {
+  adminSubmissionList.textContent = "Loading submissions...";
+
+  const { data, error } = await client
+    .from("task_submissions")
+    .select("id,task_id,user_id,proof,status,admin_notes,created_at")
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    adminSubmissionList.textContent =
+      "Could not load submissions: " + error.message;
+    return;
+  }
+
+  adminSubmissionList.replaceChildren();
+
+  if (!data || data.length === 0) {
+    adminSubmissionList.textContent = "No task submissions yet.";
+    return;
+  }
+
+  data.forEach((submission) => {
+    const item = document.createElement("div");
+    item.style.cssText = "padding:14px 0;border-bottom:1px solid #ddd;";
+
+    const status = document.createElement("p");
+    status.textContent = "Status: " + submission.status;
+
+    const user = document.createElement("p");
+    user.textContent = "User ID: " + submission.user_id;
+
+    const task = document.createElement("p");
+    task.textContent = "Task ID: " + submission.task_id;
+
+    const proof = document.createElement("p");
+    proof.textContent = "Proof: " + submission.proof;
+
+    const date = document.createElement("p");
+    date.textContent = "Submitted: " +
+      new Date(submission.created_at).toLocaleString();
+
+    item.append(status, user, task, proof, date);
+
+    if (submission.admin_notes) {
+      const notes = document.createElement("p");
+      notes.textContent = "Admin notes: " + submission.admin_notes;
+      item.appendChild(notes);
+    }
+
+    if (submission.status === "pending") {
+      const notesInput = document.createElement("textarea");
+      notesInput.maxLength = 1000;
+      notesInput.placeholder = "Optional review note";
+      notesInput.setAttribute("aria-label", "Review note");
+      notesInput.style.cssText = "width:100%;padding:10px;margin:8px 0;";
+
+      const actions = document.createElement("div");
+      actions.className = "actions";
+
+      ["approved", "rejected"].forEach((decision) => {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = decision === "approved" ? "approve" : "reject";
+        button.textContent = decision === "approved" ? "Approve Submission" : "Reject Submission";
+
+        button.addEventListener("click", async () => {
+          if (!confirm("Are you sure you want to " + decision + " this submission?")) {
+            return;
+          }
+
+          button.disabled = true;
+
+          const { error: reviewError } = await client.rpc(
+            "review_earnhub_task_submission",
+            {
+              p_submission_id: submission.id,
+              p_decision: decision,
+              p_admin_notes: notesInput.value.trim() || null
+            }
+          );
+
+          if (reviewError) {
+            alert("Review failed: " + reviewError.message);
+            button.disabled = false;
+            return;
+          }
+
+          alert("Submission " + decision + ". If approved, its reward enters the pending reward review process.");
+          await loadAdminSubmissions();
+        });
+
+        actions.appendChild(button);
+      });
+
+      item.append(notesInput, actions);
+    }
+
+    adminSubmissionList.appendChild(item);
+  });
+}
+
+document.getElementById("refreshTasks").addEventListener("click", loadAdminTasks);
+document.getElementById("refreshSubmissions").addEventListener("click", loadAdminSubmissions);
+
+loadAdminTasks();
+loadAdminSubmissions();
   </script></body>
   </html>
