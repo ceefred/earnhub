@@ -320,6 +320,58 @@ if (rewardsError) {
     historyList.appendChild(item);
   });
     }
+        // Handle withdrawal requests
+const withdrawalForm = document.getElementById("withdrawalForm");
+const withdrawalMessage = document.getElementById("withdrawalMessage");
+const withdrawalSubmit = document.getElementById("withdrawalSubmit");
+
+withdrawalForm.addEventListener("submit", async (event) => {
+  event.preventDefault();
+
+  withdrawalMessage.textContent = "Submitting your request...";
+  withdrawalSubmit.disabled = true;
+
+  const amount = Number(
+    document.getElementById("withdrawalAmount").value
+  );
+
+  const paymentMethod =
+    document.getElementById("withdrawalMethod").value;
+
+  const paymentDetails =
+    document.getElementById("withdrawalDetails").value.trim();
+
+  try {
+    const { error } = await client.rpc(
+      "request_earnhub_withdrawal",
+      {
+        p_amount: amount,
+        p_payment_method: paymentMethod,
+        p_payment_details: paymentDetails
+      }
+    );
+
+    if (error) {
+      throw error;
+    }
+
+    withdrawalMessage.textContent =
+      "Withdrawal request submitted successfully!";
+
+    withdrawalForm.reset();
+
+    setTimeout(() => {
+      window.location.reload();
+    }, 1500);
+
+  } catch (error) {
+    withdrawalMessage.textContent =
+      error.message || "Unable to submit your request.";
+
+  } finally {
+    withdrawalSubmit.disabled = false;
+  }
+});
         const { data: profile, error: profileError } = await client
 .from("profiles")
 .select("username")
