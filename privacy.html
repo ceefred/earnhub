@@ -2,84 +2,289 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#101827">
+
   <title>Privacy Policy | EarnHub</title>
+
+  <style>
+    :root {
+      --bg: #0b1220;
+      --panel: #121d30;
+      --text: #edf4ff;
+      --muted: #9fb0c8;
+      --accent: #71e0b5;
+      --accent2: #8fb8ff;
+      --border: #263650;
+      --warn: #f5ce77;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      background: linear-gradient(
+        160deg,
+        #0b1220,
+        #101b2d 55%,
+        #0c1423
+      );
+      color: var(--text);
+      font: 16px/1.7 system-ui, -apple-system,
+        "Segoe UI", Roboto, Arial, sans-serif;
+    }
+
+    a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+
+    .wrap {
+      max-width: 900px;
+      margin: auto;
+      padding: 22px;
+    }
+
+    .top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+      padding: 10px 0 26px;
+    }
+
+    .brand {
+      font-weight: 850;
+      font-size: 1.5rem;
+      letter-spacing: -.04em;
+    }
+
+    .brand span {
+      color: var(--accent);
+    }
+
+    .badge {
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      color: var(--muted);
+      padding: 7px 11px;
+      font-size: .78rem;
+    }
+
+    .card {
+      background: rgba(18, 29, 48, .92);
+      border: 1px solid var(--border);
+      border-radius: 17px;
+      padding: 22px;
+      margin-bottom: 16px;
+    }
+
+    h1 {
+      font-size: clamp(2rem, 6vw, 3rem);
+      line-height: 1.15;
+      letter-spacing: -.04em;
+      margin: 10px 0;
+    }
+
+    h2 {
+      color: var(--accent);
+      font-size: 1.15rem;
+      margin-top: 26px;
+      margin-bottom: 8px;
+    }
+
+    p {
+      margin-top: 8px;
+    }
+
+    .eyebrow {
+      color: var(--accent);
+      font-weight: 700;
+      font-size: .82rem;
+      text-transform: uppercase;
+      letter-spacing: .12em;
+    }
+
+    .notice {
+      background: #342b17;
+      border: 1px solid #6b5728;
+      color: #f8e4af;
+      border-radius: 13px;
+      padding: 15px;
+      font-size: .92rem;
+      margin: 20px 0;
+    }
+
+    .muted {
+      color: var(--muted);
+    }
+
+    .footer {
+      border-top: 1px solid var(--border);
+      margin-top: 30px;
+      padding: 22px 0 10px;
+      color: var(--muted);
+      font-size: .85rem;
+    }
+
+    .footer a {
+      margin-right: 14px;
+    }
+
+    @media (max-width: 650px) {
+      .wrap {
+        padding: 16px;
+      }
+
+      .card {
+        padding: 17px;
+      }
+    }
+  </style>
 </head>
+
 <body>
-  <header>
-    <h1>EarnHub</h1>
-    <h2>Privacy Policy</h2>
-  </header>
+  <div class="wrap">
 
-  <main>
-    <p><strong>Pre-launch notice:</strong> EarnHub is under development.
-    Account registration and login are available for testing, but live
-    earning offers, verified offer rewards, and real-money payouts are
-    not yet operational. Do not submit sensitive payment information
-    or cryptocurrency wallet secrets through the demo.</p>
+    <header class="top">
+      <a class="brand" href="index.html">
+        Earn<span>Hub</span>
+      </a>
 
-    <h3>Information We Collect</h3>
-    <p>EarnHub may collect information you provide when creating or
-    using an account, including your email address and username.
-    The service also stores account identifiers, wallet balances,
-    reward records, and withdrawal request records associated with
-    test or development activity.</p>
+      <span class="badge">Early prototype · Demo only</span>
+    </header>
 
-    <p>Depending on the features introduced in the future, we may
-    collect technical information, offer completion records, and
-    payment details needed to provide rewards and process withdrawals.</p>
+    <main>
+      <div class="eyebrow">Your information matters</div>
+      <h1>Privacy Policy</h1>
 
-    <h3>How We Use Information</h3>
-    <p>We use information to create and manage accounts, display account
-    information, maintain wallet and transaction records, test platform
-    functionality, prevent abuse, provide support, and prepare for
-    future rewards and payment services.</p>
+      <p class="muted">
+        This policy explains how EarnHub handles information
+        while the platform is being developed.
+      </p>
 
-    <h3>Third-Party Services</h3>
-    <p>EarnHub currently uses Supabase for authentication and database
-    services. Information submitted through account features may be
-    processed by Supabase to provide those services. Please review
-    <a href="https://supabase.com/privacy">Supabase's Privacy Policy</a>.</p>
+      <div class="notice">
+        <strong>Pre-launch notice:</strong>
+        EarnHub is under development. Account registration and
+        login are available for testing, but live earning offers,
+        verified offer rewards, and real-money payouts are not yet
+        operational. Do not submit sensitive payment information
+        or cryptocurrency wallet secrets through the demo.
+      </div>
 
-    <p>Future survey, advertising, offerwall, analytics, or payment
-    providers may process information under their own privacy policies.
-    We will update this policy before enabling those integrations.</p>
+      <section class="card">
+        <h2>1. Information We Collect</h2>
 
-    <h3>Cookies and Tracking</h3>
-    <p>Authentication and future integrations may use cookies, local
-    storage, or similar technologies where necessary. Any additional
-    tracking practices will be documented before the relevant features
-    are enabled.</p>
+        <p>
+          EarnHub may collect information you provide when creating
+          or using an account, including your email address and
+          username. The service also stores account identifiers,
+          wallet balances, reward records, and withdrawal request
+          records associated with test or development activity.
+        </p>
 
-    <h3>Data Retention and Security</h3>
-    <p>We retain information for as long as reasonably necessary for
-    account management, testing, security, and applicable legal
-    requirements. We apply safeguards intended to protect information,
-    but no online service can guarantee absolute security.</p>
+        <p>
+          Depending on the features introduced in the future,
+          we may collect technical information, offer completion
+          records, and payment details needed to provide rewards
+          and process withdrawals.
+        </p>
 
-    <h3>Your Privacy Rights</h3>
-    <p>Depending on applicable law, you may have rights to request
-    access to, correction of, or deletion of your personal information.
-    A dedicated privacy contact will be provided before the full service
-    launches.</p>
+        <h2>2. How We Use Information</h2>
 
-    <h3>Children</h3>
-    <p>EarnHub is not intended for children. Minimum age and eligibility
-    requirements will be established in the final terms before the
-    rewards service launches.</p>
+        <p>
+          We use information to create and manage accounts, display
+          account information, maintain wallet and transaction
+          records, test platform functionality, prevent abuse,
+          provide support, and prepare for future rewards and
+          payment services.
+        </p>
 
-    <h3>Policy Updates</h3>
-    <p>This policy may be updated as EarnHub develops. We will publish
-    revisions on this page and add an effective date before the live
-    rewards service launches.</p>
-  </main>
+        <h2>3. Third-Party Services</h2>
 
-  <footer>
-    <p>EarnHub ·
-      <a href="index.html">Home</a> ·
-      <a href="terms.html">Terms</a> ·
+        <p>
+          EarnHub currently uses Supabase for authentication and
+          database services. Information submitted through account
+          features may be processed by Supabase to provide those
+          services. Please review
+          <a href="https://supabase.com/privacy"
+             target="_blank"
+             rel="noopener noreferrer">
+            Supabase's Privacy Policy
+          </a>.
+        </p>
+
+        <p>
+          Future survey, advertising, offerwall, analytics, or
+          payment providers may process information under their
+          own privacy policies. We will update this policy before
+          enabling those integrations.
+        </p>
+
+        <h2>4. Cookies and Tracking</h2>
+
+        <p>
+          Authentication and future integrations may use cookies,
+          local storage, or similar technologies where necessary.
+          Any additional tracking practices will be documented
+          before the relevant features are enabled.
+        </p>
+
+        <h2>5. Data Retention and Security</h2>
+
+        <p>
+          We retain information for as long as reasonably necessary
+          for account management, testing, security, and applicable
+          legal requirements. We apply safeguards intended to
+          protect information, but no online service can guarantee
+          absolute security.
+        </p>
+
+        <h2>6. Your Privacy Rights</h2>
+
+        <p>
+          Depending on applicable law, you may have rights to
+          request access to, correction of, or deletion of your
+          personal information. Contact details for privacy
+          requests will be provided before the full service launches.
+        </p>
+
+        <h2>7. Children</h2>
+
+        <p>
+          EarnHub is not intended for children. Minimum age and
+          eligibility requirements will be established in the
+          final terms before the rewards service launches.
+        </p>
+
+        <h2>8. Policy Updates</h2>
+
+        <p>
+          This policy may be updated as EarnHub develops. We will
+          publish revisions on this page and add an effective date
+          before the live rewards service launches.
+        </p>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <p>
+        EarnHub is under development. This prototype does not
+        currently provide live earning offers or real-money payouts.
+      </p>
+
+      <a href="index.html">Home</a>
+      <a href="terms.html">Terms</a>
       <a href="contact.html">Contact</a>
-    </p>
-  </footer>
+    </footer>
+
+  </div>
 </body>
-</html>
+  </html>
