@@ -1,91 +1,372 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="theme-color" content="#101827"><title>EarnHub — Rewards prototype</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#101827">
+<title>EarnHub — Rewards</title>
+
 <style>
-:root{--bg:#0b1220;--panel:#121d30;--panel2:#17243a;--text:#edf4ff;--muted:#9fb0c8;--accent:#71e0b5;--accent2:#8fb8ff;--border:#263650;--warn:#f5ce77}
-*{box-sizing:border-box}body{margin:0;background:linear-gradient(160deg,#0b1220,#101b2d 55%,#0c1423);color:var(--text);font:16px/1.5 system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}button,a{font:inherit}.wrap{max-width:1050px;margin:auto;padding:22px}.top{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 0 26px}.brand{font-weight:850;font-size:1.35rem;letter-spacing:-.04em}.brand span{color:var(--accent)}.badge{border:1px solid var(--border);border-radius:999px;color:var(--muted);padding:7px 11px;font-size:.78rem}.hero{padding:28px 0 24px}.eyebrow{color:var(--accent);font-weight:700;font-size:.82rem;text-transform:uppercase;letter-spacing:.12em}.hero h1{font-size:clamp(2.1rem,7vw,4rem);line-height:1.04;letter-spacing:-.055em;max-width:720px;margin:12px 0}.hero p{max-width:650px;color:var(--muted);font-size:1.05rem}.notice{background:#342b17;border:1px solid #6b5728;color:#f8e4af;border-radius:13px;padding:13px 15px;font-size:.9rem;margin:18px 0 24px}.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:22px 0 30px}.stat,.card{background:rgba(18,29,48,.92);border:1px solid var(--border);border-radius:17px;padding:17px}.stat strong{display:block;font-size:1.2rem}.stat span{color:var(--muted);font-size:.85rem}.tabs{display:flex;gap:8px;overflow:auto;padding:4px 0 14px}.tab{white-space:nowrap;border:1px solid var(--border);border-radius:999px;background:var(--panel);color:var(--muted);padding:10px 15px;cursor:pointer}.tab.active{background:var(--accent);border-color:var(--accent);color:#062319;font-weight:800}.section{display:none}.section.active{display:block}.section-head{display:flex;align-items:end;justify-content:space-between;gap:15px;margin:10px 0 16px}.section h2{margin:0;font-size:1.55rem;letter-spacing:-.03em}.muted{color:var(--muted)}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px}.task{display:flex;flex-direction:column;gap:10px}.task-top{display:flex;align-items:center;justify-content:space-between;gap:10px}.pill{font-size:.75rem;color:var(--accent2);border:1px solid #344b70;padding:4px 8px;border-radius:999px}.reward{font-weight:850;color:var(--accent);font-size:1.1rem}.task h3{margin:0;font-size:1.05rem}.task p{margin:0;color:var(--muted);font-size:.9rem}.btn{border:0;border-radius:10px;background:var(--accent);color:#062319;font-weight:800;padding:11px 14px;cursor:pointer;text-align:center}.btn.secondary{background:var(--panel2);border:1px solid var(--border);color:var(--text)}.btn:disabled{opacity:.55;cursor:not-allowed}.provider{display:flex;align-items:center;justify-content:space-between;gap:12px}.provider h3{margin:0}.provider small{color:var(--muted)}.provider-status{font-size:.76rem;border:1px solid var(--border);border-radius:999px;padding:5px 8px;color:var(--warn)}.faucetbox{text-align:center;padding:28px 18px}.coin{font-size:2.5rem}.faucetbox h3{margin:5px 0}.faucetbox .muted{max-width:520px;margin:0 auto 18px}.footer{border-top:1px solid var(--border);margin-top:34px;padding:22px 0 10px;color:var(--muted);font-size:.82rem}.modal{display:none;position:fixed;inset:0;background:#0009;align-items:center;justify-content:center;padding:20px}.modal.show{display:flex}.modalbox{max-width:440px;width:100%;background:var(--panel);border:1px solid var(--border);border-radius:18px;padding:22px}.modalbox h3{margin-top:0}.modalbox p{color:var(--muted)}.close{float:right;background:none;color:var(--text);border:0;font-size:1.4rem;cursor:pointer}
-@media(max-width:650px){.wrap{padding:16px}.stats{grid-template-columns:1fr}.grid{grid-template-columns:1fr}.section-head{align-items:start;flex-direction:column}.top{padding-bottom:10px}.hero{padding-top:18px}}
+:root {
+  --bg:#0b1220;
+  --panel:#121d30;
+  --panel2:#17243a;
+  --text:#edf4ff;
+  --muted:#9fb0c8;
+  --accent:#71e0b5;
+  --accent2:#8fb8ff;
+  --border:#263650;
+  --warn:#f5ce77;
+}
+* { box-sizing:border-box; }
+body {
+  margin:0;
+  background:linear-gradient(160deg,#0b1220,#101b2d 55%,#0c1423);
+  color:var(--text);
+  font:16px/1.5 system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+}
+button,a { font:inherit; }
+.wrap { max-width:1050px;margin:auto;padding:22px; }
+.top {
+  display:flex;align-items:center;justify-content:space-between;
+  gap:12px;padding:10px 0 26px;
+}
+.brand { font-weight:850;font-size:1.35rem;letter-spacing:-.04em; }
+.brand span { color:var(--accent); }
+.badge {
+  border:1px solid var(--border);border-radius:999px;
+  color:var(--muted);padding:7px 11px;font-size:.78rem;
+}
+.hero { padding:28px 0 24px; }
+.eyebrow {
+  color:var(--accent);font-weight:700;font-size:.82rem;
+  text-transform:uppercase;letter-spacing:.12em;
+}
+.hero h1 {
+  font-size:clamp(2.1rem,7vw,4rem);line-height:1.04;
+  letter-spacing:-.055em;max-width:720px;margin:12px 0;
+}
+.hero p { max-width:650px;color:var(--muted);font-size:1.05rem; }
+.notice {
+  background:#342b17;border:1px solid #6b5728;color:#f8e4af;
+  border-radius:13px;padding:13px 15px;font-size:.9rem;
+  margin:18px 0 24px;
+}
+.stats { display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:22px 0 30px; }
+.stat,.card {
+  background:rgba(18,29,48,.92);
+  border:1px solid var(--border);border-radius:17px;padding:17px;
+}
+.stat strong { display:block;font-size:1.2rem; }
+.stat span { color:var(--muted);font-size:.85rem; }
+.tabs { display:flex;gap:8px;overflow:auto;padding:4px 0 14px; }
+.tab {
+  white-space:nowrap;border:1px solid var(--border);border-radius:999px;
+  background:var(--panel);color:var(--muted);padding:10px 15px;cursor:pointer;
+}
+.tab.active { background:var(--accent);border-color:var(--accent);color:#062319;font-weight:800; }
+.section { display:none; }
+.section.active { display:block; }
+.section-head {
+  display:flex;align-items:end;justify-content:space-between;
+  gap:15px;margin:10px 0 16px;
+}
+.section h2 { margin:0;font-size:1.55rem;letter-spacing:-.03em; }
+.muted { color:var(--muted); }
+.grid { display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px; }
+.task { display:flex;flex-direction:column;gap:10px; }
+.task-top { display:flex;align-items:center;justify-content:space-between;gap:10px; }
+.pill {
+  font-size:.75rem;color:var(--accent2);border:1px solid #344b70;
+  padding:4px 8px;border-radius:999px;
+}
+.reward { font-weight:850;color:var(--accent);font-size:1.1rem; }
+.task h3 { margin:0;font-size:1.05rem; }
+.task p { margin:0;color:var(--muted);font-size:.9rem; }
+.btn {
+  display:inline-block;border:0;border-radius:10px;background:var(--accent);
+  color:#062319;font-weight:800;padding:11px 14px;cursor:pointer;text-align:center;
+  text-decoration:none;
+}
+.btn.secondary {
+  background:var(--panel2);border:1px solid var(--border);color:var(--text);
+}
+.btn:disabled { opacity:.55;cursor:not-allowed; }
+.provider { display:flex;align-items:center;justify-content:space-between;gap:12px; }
+.provider h3 { margin:0; }
+.provider small { color:var(--muted); }
+.provider-status {
+  font-size:.76rem;border:1px solid var(--border);border-radius:999px;
+  padding:5px 8px;color:var(--warn);
+}
+.faucetbox { text-align:center;padding:28px 18px; }
+.coin { font-size:2.5rem; }
+.faucetbox h3 { margin:5px 0; }
+.faucetbox .muted { max-width:520px;margin:0 auto 18px; }
+.footer {
+  border-top:1px solid var(--border);margin-top:34px;
+  padding:22px 0 10px;color:var(--muted);font-size:.82rem;
+}
+.modal {
+  display:none;position:fixed;inset:0;background:#0009;
+  align-items:center;justify-content:center;padding:20px;
+}
+.modal.show { display:flex; }
+.modalbox {
+  max-width:440px;width:100%;background:var(--panel);
+  border:1px solid var(--border);border-radius:18px;padding:22px;
+}
+.modalbox h3 { margin-top:0; }
+.modalbox p { color:var(--muted); }
+.close { float:right;background:none;color:var(--text);border:0;font-size:1.4rem;cursor:pointer; }
+@media(max-width:650px) {
+  .wrap { padding:16px; }
+  .stats { grid-template-columns:1fr; }
+  .grid { grid-template-columns:1fr; }
+  .section-head { align-items:start;flex-direction:column; }
+  .top { padding-bottom:10px; }
+  .hero { padding-top:18px; }
+}
 </style>
 </head>
+
 <body>
+
 <div style="text-align:center;padding:15px;background:#101a2c;">
-  <a href="auth.html" style="display:inline-block;background:#38d996;color:#07140f;padding:12px 20px;border-radius:8px;text-decoration:none;font-weight:bold;margin:5px;">Sign Up</a>
-  <a href="auth.html" style="display:inline-block;background:#26364e;color:white;padding:12px 20px;border-radius:8px;text-decoration:none;font-weight:bold;margin:5px;">Log In</a>
-  <a href="tasks.html" style="display:inline-block;background:#17243a;color:#71e0b5;border:1px solid #263650;padding:12px 20px;border-radius:8px;text-decoration:none;font-weight:bold;margin:5px;">Simple Tasks</a>
+  <a href="auth.html" class="btn" style="margin:5px;">Sign Up</a>
+  <a href="auth.html" class="btn secondary" style="margin:5px;">Log In</a>
+  <a href="tasks.html" class="btn secondary" style="margin:5px;">Simple Tasks</a>
 </div>
+
 <div class="wrap">
-<header class="top"><div class="brand">Earn<span>Hub</span></div><div class="badge">Pre-launch · Getting ready</div></header>
+<header class="top">
+  <div class="brand">Earn<span>Hub</span></div>
+  <div class="badge">Pre-launch · Getting ready</div>
+</header>
+
 <main>
 <section class="hero">
   <div class="eyebrow">Small tasks. Transparent rewards.</div>
-
   <h1>Make your spare time count.</h1>
-
   <p>
-    Discover simple tasks today and explore sponsored offers as EarnHub
-    expands its earning opportunities. We are building a transparent
-    platform where task requirements, reward status, and verification
-    matter.
+    Discover simple tasks and explore sponsored surveys as EarnHub expands.
+    We are building a transparent platform where task requirements,
+    reward status, and verification matter.
   </p>
-
   <div class="notice">
     <strong>EarnHub update:</strong>
-    Simple tasks are available for testing. Sponsored offers and
-    verified partner rewards are not yet live, and real-money
-    withdrawals are not currently operational.
+    Simple tasks are available for testing. Partner rewards and real-money
+    withdrawals are not yet fully operational.
   </div>
-</section><div class="stats"><div class="stat"><strong>Pending: —</strong><span>Partner verification required</span></div><div class="stat"><strong>Available: —</strong><span>Only approved rewards count</span></div><div class="stat"><strong>Withdrawals: —</strong><span>Payment options not configured</span></div></div>
-<nav class="tabs" aria-label="Dashboard sections"><button class="tab active" data-tab="offers">Offerwall tasks</button><button class="tab" data-tab="faucet">Crypto faucet</button><button class="tab" data-tab="providers">Providers</button><button class="tab" data-tab="rules">How it works</button></nav>
-<section class="section active" id="offers"><div class="section-head"><div><h2>Sponsored tasks</h2><div class="muted">Sponsored opportunities are being prepared for launch.</div></div><span class="badge">Global access depends on partner availability</span></div><div class="grid">
-<article class="card task"><div class="task-top"><span class="pill">Survey</span><span class="reward">Reward varies</span></div><h3>Complete a research survey</h3><p>Answer questions for a research provider. Eligibility and completion validation apply.</p><button class="btn" data-demo="Survey offers will appear after a provider approves the website and supplies eligible campaigns.">View task</button></article>
-<article class="card task"><div class="task-top"><span class="pill">App offer</span><span class="reward">Reward varies</span></div><h3>Try a sponsored app</h3><p>Follow the campaign's exact requirements. Some offers require a milestone, not just an install.</p><button class="btn" data-demo="App offers are not connected. We will only display tasks explicitly available for the user's country and device.">View task</button></article>
-<article class="card task"><div class="task-top"><span class="pill">Game milestone</span><span class="reward">Reward varies</span></div><h3>Reach a game milestone</h3><p>Complete the specified in-game objective and wait for the partner to validate it.</p><button class="btn" data-demo="Milestone offers can be listed only after a partner integration and server-side conversion tracking are configured.">View task</button></article>
-<article class="card task"><div class="task-top"><span class="pill">Sponsored activity</span><span class="reward">Reward varies</span></div><h3>More ways to earn</h3><p>Additional activities may be added after approval and a review of each provider's rules.</p><button class="btn" data-demo="We will add more activity types only when a real partner supports them and the payout economics make sense.">Coming soon</button></article>
-</div></section>
-<section class="section" id="faucet"><div class="section-head"><div><h2>Crypto faucet</h2><div class="muted">A second earning feature for tiny crypto rewards.</div></div><span class="badge">Not funded yet</span></div><div class="card faucetbox"><div class="coin">🪙</div><h3>Micro-claims, paid in crypto</h3><p class="muted">A crypto faucet can issue tiny amounts of cryptocurrency on a cooldown. The site owner must fund payouts from a real revenue source or its own balance; FaucetPay is a payout tool, not free money.</p><button class="btn" data-demo="Faucet claims are disabled until we have a funded balance, anti-bot controls, cooldown rules, and a secure server-side FaucetPay integration.">Faucet not active</button></div></section>
-<section class="section" id="providers"><div class="section-head"><div><h2>Provider integrations</h2><div class="muted">Planned integrations — approval is not yet confirmed.</div></div></div><div class="grid">
-<div class="card provider"><div><h3>Lootably</h3><small>Offerwall / offers API</small></div><span class="provider-status">Not connected</span></div>
-<div class="card provider"><div><h3>AdGem</h3><small>Advertiser offer campaigns</small></div><span class="provider-status">Not connected</span></div>
-<div class="card provider"><div><h3>CPX Research</h3><small>Surveys</small></div><span class="provider-status">Not connected</span></div>
-<div class="card provider"><div><h3>BitLabs</h3><small>Surveys / rewarded activities</small></div><span class="provider-status">Not connected</span></div>
-</div><div class="notice">Provider names are listed for planning only. Do not show their logos or imply endorsement/approval before authorization. We must apply and follow each provider's terms.</div></section>
-<section class="section" id="rules"><div class="section-head"><div><h2>How rewards work</h2><div class="muted">Built around transparency.</div></div></div><div class="grid"><div class="card"><h3>1. Complete</h3><p class="muted">Read the task instructions and complete the advertiser's required action.</p></div><div class="card"><h3>2. Verify</h3><p class="muted">The provider reports a conversion to our secure backend. Browser-only claims are not trusted.</p></div><div class="card"><h3>3. Credit</h3><p class="muted">Eligible rewards are marked pending until validation and reversal rules are satisfied.</p></div><div class="card"><h3>4. Withdraw</h3><p class="muted">Withdrawals open only after supported payment methods, thresholds, and sufficient funds are configured.</p></div></div><div class="notice">We will not promise fixed earnings until real campaign payouts, availability by country, fees, reversals, and payment timing are confirmed.</div></section>
+</section>
+
+<div class="stats">
+  <div class="stat"><strong>Pending: —</strong><span>Partner verification required</span></div>
+  <div class="stat"><strong>Available: —</strong><span>Only approved rewards count</span></div>
+  <div class="stat"><strong>Withdrawals: —</strong><span>Payment options not configured</span></div>
+</div>
+
+<nav class="tabs" aria-label="Dashboard sections">
+  <button class="tab active" data-tab="offers">Offerwall tasks</button>
+  <button class="tab" data-tab="faucet">Crypto faucet</button>
+  <button class="tab" data-tab="providers">Providers</button>
+  <button class="tab" data-tab="rules">How it works</button>
+</nav>
+
+<section class="section active" id="offers">
+  <div class="section-head">
+    <div>
+      <h2>Sponsored tasks</h2>
+      <div class="muted">Explore survey opportunities.</div>
+    </div>
+    <span class="badge">Availability depends on your country</span>
+  </div>
+
+  <div class="grid">
+
+    <article class="card task">
+      <div class="task-top">
+        <span class="pill">Survey</span>
+        <span class="reward">Reward varies</span>
+      </div>
+      <h3>CPX Research surveys</h3>
+      <p>
+        Answer research surveys when available. Eligibility and completion
+        validation apply. You must be logged in to continue.
+      </p>
+      <button class="btn" id="cpxSurveyBtn">Open CPX Surveys</button>
+      <p id="cpxMessage" role="status" aria-live="polite"></p>
+    </article>
+
+    <article class="card task">
+      <div class="task-top">
+        <span class="pill">App offer</span>
+        <span class="reward">Reward varies</span>
+      </div>
+      <h3>Try a sponsored app</h3>
+      <p>Follow each campaign's exact requirements.</p>
+      <button class="btn secondary" data-demo="App offers are not connected yet.">Coming soon</button>
+    </article>
+
+    <article class="card task">
+      <div class="task-top">
+        <span class="pill">Game milestone</span>
+        <span class="reward">Reward varies</span>
+      </div>
+      <h3>Reach a game milestone</h3>
+      <p>Complete the specified in-game objective and wait for validation.</p>
+      <button class="btn secondary" data-demo="Game milestone offers are not connected yet.">Coming soon</button>
+    </article>
+
+    <article class="card task">
+      <div class="task-top">
+        <span class="pill">Sponsored activity</span>
+        <span class="reward">Reward varies</span>
+      </div>
+      <h3>More ways to earn</h3>
+      <p>Additional activities may be added after provider approval.</p>
+      <button class="btn secondary" data-demo="More activities will be added after integration and testing.">Coming soon</button>
+    </article>
+
+  </div>
+</section>
+
+<section class="section" id="faucet">
+  <div class="section-head">
+    <div>
+      <h2>Crypto faucet</h2>
+      <div class="muted">A future feature for small crypto rewards.</div>
+    </div>
+    <span class="badge">Not funded yet</span>
+  </div>
+  <div class="card faucetbox">
+    <div class="coin">🪙</div>
+    <h3>Micro-claims, paid in crypto</h3>
+    <p class="muted">
+      Faucet claims remain disabled until funding, anti-bot controls,
+      cooldown rules, and secure payout integration are ready.
+    </p>
+    <button class="btn secondary" data-demo="Faucet claims are not active yet.">Faucet not active</button>
+  </div>
+</section>
+
+<section class="section" id="providers">
+  <div class="section-head">
+    <div>
+      <h2>Provider integrations</h2>
+      <div class="muted">Integration and reward testing are in progress.</div>
+    </div>
+  </div>
+
+  <div class="grid">
+    <div class="card provider">
+      <div><h3>Lootably</h3><small>Offerwall / offers API</small></div>
+      <span class="provider-status">Not connected</span>
+    </div>
+    <div class="card provider">
+      <div><h3>AdGem</h3><small>Advertiser offer campaigns</small></div>
+      <span class="provider-status">Not connected</span>
+    </div>
+    <div class="card provider">
+      <div><h3>CPX Research</h3><small>Survey integration testing</small></div>
+      <span class="provider-status">Testing</span>
+    </div>
+    <div class="card provider">
+      <div><h3>BitLabs</h3><small>Surveys / rewarded activities</small></div>
+      <span class="provider-status">Not connected</span>
+    </div>
+  </div>
+
+  <div class="notice">
+    Provider names are listed for planning and integration testing.
+    Rewards are not confirmed until the complete callback flow has been tested.
+  </div>
+</section>
+
+<section class="section" id="rules">
+  <div class="section-head">
+    <div>
+      <h2>How rewards work</h2>
+      <div class="muted">Built around transparency.</div>
+    </div>
+  </div>
+
+  <div class="grid">
+    <div class="card"><h3>1. Complete</h3><p class="muted">Complete the provider's required action.</p></div>
+    <div class="card"><h3>2. Verify</h3><p class="muted">The provider reports the result to our secure backend.</p></div>
+    <div class="card"><h3>3. Credit</h3><p class="muted">Eligible rewards remain pending until validation.</p></div>
+    <div class="card"><h3>4. Withdraw</h3><p class="muted">Withdrawals open after payment methods and rules are configured.</p></div>
+  </div>
+
+  <div class="notice">
+    We will not promise fixed earnings until provider payouts, availability,
+    fees, reversals, and payment timing are confirmed.
+  </div>
+</section>
 </main>
 
 <footer class="footer">
   <p>
-    EarnHub is preparing to launch. Sponsored offers, verified partner rewards, and real-money withdrawals are not yet operational. Test balances do not represent real earnings.
+    EarnHub is preparing to launch. Sponsored offers, verified partner rewards,
+    and real-money withdrawals are not yet fully operational.
+    Test balances do not represent real earnings.
   </p>
 
   <nav aria-label="Footer navigation">
-    <a href="index.html"
-       style="color:#71e0b5;margin-right:14px;">
-      Home
-    </a>
-
-    <a href="privacy.html"
-       style="color:#71e0b5;margin-right:14px;">
-      Privacy Policy
-    </a>
-
-    <a href="terms.html"
-       style="color:#71e0b5;margin-right:14px;">
-      Terms &amp; Conditions
-    </a>
-
-    <a href="contact.html"
-       style="color:#71e0b5;">
-      Contact Us
-    </a>
+    <a href="index.html" style="color:#71e0b5;margin-right:14px;">Home</a>
+    <a href="privacy.html" style="color:#71e0b5;margin-right:14px;">Privacy Policy</a>
+    <a href="terms.html" style="color:#71e0b5;margin-right:14px;">Terms &amp; Conditions</a>
+    <a href="contact.html" style="color:#71e0b5;">Contact Us</a>
   </nav>
-</footer></div>
-<div class="modal" id="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle"><div class="modalbox"><button class="close" aria-label="Close">×</button><h3 id="modalTitle">Demo only</h3><p id="modalText"></p><button class="btn" id="modalOk">Got it</button></div></div>
+</footer>
+</div>
+
+<div class="modal" id="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+  <div class="modalbox">
+    <button class="close" aria-label="Close">×</button>
+    <h3 id="modalTitle">Information</h3>
+    <p id="modalText"></p>
+    <button class="btn" id="modalOk">Got it</button>
+  </div>
+</div>
+
 <script>
-const tabs=[...document.querySelectorAll('.tab')],sections=[...document.querySelectorAll('.section')];tabs.forEach(t=>t.addEventListener('click',()=>{tabs.forEach(x=>x.classList.toggle('active',x===t));sections.forEach(s=>s.classList.toggle('active',s.id===t.dataset.tab))}));
-const modal=document.getElementById('modal');function closeModal(){modal.classList.remove('show')}document.querySelectorAll('[data-demo]').forEach(b=>b.addEventListener('click',()=>{document.getElementById('modalText').textContent=b.dataset.demo;modal.classList.add('show')}));document.querySelector('.close').addEventListener('click',closeModal);document.getElementById('modalOk').addEventListener('click',closeModal);modal.addEventListener('click',e=>{if(e.target===modal)closeModal()});
-</script><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script>
+const tabs = [...document.querySelectorAll('.tab')];
+const sections = [...document.querySelectorAll('.section')];
+
+tabs.forEach(tab => {
+  tab.addEventListener('click', () => {
+    tabs.forEach(item => item.classList.toggle('active', item === tab));
+    sections.forEach(section =>
+      section.classList.toggle('active', section.id === tab.dataset.tab)
+    );
+  });
+});
+
+const modal = document.getElementById('modal');
+
+function closeModal() {
+  modal.classList.remove('show');
+}
+
+document.querySelectorAll('[data-demo]').forEach(button => {
+  button.addEventListener('click', () => {
+    document.getElementById('modalText').textContent = button.dataset.demo;
+    modal.classList.add('show');
+  });
+});
+
+document.querySelector('.close').addEventListener('click', closeModal);
+document.getElementById('modalOk').addEventListener('click', closeModal);
+
+modal.addEventListener('click', event => {
+  if (event.target === modal) closeModal();
+});
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script>
 (async function () {
   const SUPABASE_URL = "https://ncgijesgfoadjyshfoqv.supabase.co";
   const SUPABASE_KEY = "sb_publishable_qRghUkUbwl_M6qAD3dGnTA_Oe1qaoHM";
@@ -95,7 +376,11 @@ const modal=document.getElementById('modal');function closeModal(){modal.classLi
     SUPABASE_KEY
   );
 
-  const { data: { session } } = await client.auth.getSession();
+  const { data: { session }, error } = await client.auth.getSession();
+
+  if (error) {
+    console.error("Could not check login status:", error.message);
+  }
 
   if (session) {
     const authLinks = document.querySelectorAll('a[href="auth.html"]');
@@ -109,5 +394,43 @@ const modal=document.getElementById('modal');function closeModal(){modal.classLi
       }
     });
   }
+
+  const cpxButton = document.getElementById('cpxSurveyBtn');
+  const cpxMessage = document.getElementById('cpxMessage');
+
+  cpxButton.addEventListener('click', async () => {
+    cpxButton.disabled = true;
+    cpxMessage.textContent = "Checking your account...";
+
+    const { data: { session: currentSession }, error: sessionError } =
+      await client.auth.getSession();
+
+    cpxButton.disabled = false;
+
+    if (sessionError || !currentSession) {
+      window.location.href = "auth.html";
+      return;
+    }
+
+    const user = currentSession.user;
+
+    const params = new URLSearchParams({
+      app_id: "37156",
+      ext_user_id: user.id,
+      username: user.user_metadata?.username || "",
+      email: user.email || ""
+    });
+
+    const cpxUrl =
+      "https://offers.cpx-research.com/index.php?" + params.toString();
+
+    cpxMessage.textContent =
+      "Opening CPX Research. Rewards are not yet confirmed until callback testing is complete.";
+
+    window.open(cpxUrl, "_blank", "noopener,noreferrer");
+  });
 })();
-</script></body></html>
+</script>
+
+</body>
+          </html>
