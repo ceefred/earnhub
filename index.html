@@ -54,8 +54,21 @@ button,a { font:inherit; }
 }
 .stats { display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:22px 0 30px; }
 .stat,.card {
-  background:rgba(18,29,48,.92);
-  border:1px solid var(--border);border-radius:17px;padding:17px;
+  background:linear-gradient(145deg,rgba(23,36,58,.98),rgba(18,29,48,.96));
+  border:1px solid #2b3e59;
+  border-radius:19px;
+  padding:20px;
+  box-shadow:0 10px 28px rgba(0,0,0,.12);
+  transition:border-color .2s ease,transform .2s ease,box-shadow .2s ease;
+}
+
+.card:hover {
+  border-color:#3b6a62;
+  box-shadow:0 14px 32px rgba(0,0,0,.2);
+}
+
+.task {
+  min-height:100%;
 }
 .stat strong { display:block;font-size:1.2rem; }
 .stat span { color:var(--muted);font-size:.85rem; }
