@@ -165,12 +165,75 @@ box-shadow:none;
 .modalbox p { color:var(--muted); }
 .close { float:right;background:none;color:var(--text);border:0;font-size:1.4rem;cursor:pointer; }
 @media(max-width:650px) {
-  .wrap { padding:16px; }
-  .stats { grid-template-columns:1fr; }
-  .grid { grid-template-columns:1fr; }
-  .section-head { align-items:start;flex-direction:column; }
-  .top { padding-bottom:10px; }
-  .hero { padding-top:18px; }
+.wrap {
+padding:16px;
+}
+
+.stats {
+grid-template-columns:1fr;
+gap:10px;
+}
+
+.stat {
+padding:16px;
+}
+
+.grid {
+grid-template-columns:1fr;
+gap:14px;
+}
+
+.card {
+padding:18px;
+border-radius:16px;
+}
+
+.section-head {
+align-items:start;
+flex-direction:column;
+gap:8px;
+}
+
+.tabs {
+gap:7px;
+padding-bottom:12px;
+-webkit-overflow-scrolling:touch;
+}
+
+.tab {
+padding:9px 12px;
+font-size:.9rem;
+}
+
+.top {
+padding-bottom:10px;
+}
+
+.hero {
+padding-top:18px;
+}
+
+.hero h1 {
+font-size:clamp(2rem,9vw,3rem);
+}
+
+.hero p {
+font-size:1rem;
+}
+
+.task-top {
+align-items:flex-start;
+flex-wrap:wrap;
+}
+
+.provider {
+align-items:flex-start;
+flex-direction:column;
+}
+
+.btn {
+max-width:100%;
+}
 }
 </style>
 </head>
